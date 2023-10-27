@@ -1,8 +1,8 @@
 import type { AppProps } from 'next/app'
-import { ChakraBaseProvider } from '@chakra-ui/react'
+import { ChakraBaseProvider, ChakraProvider } from '@chakra-ui/react'
 
 export default function App({ Component, pageProps }: AppProps) {
-  return <ChakraBaseProvider >
+  return <ChakraProvider >
   <Component {...pageProps} />
-</ChakraBaseProvider>
+</ChakraProvider>
 }
