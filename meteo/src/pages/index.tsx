@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 import React, { useState, useEffect, useMemo } from "react"
@@ -20,32 +19,37 @@ return <Map />
 
 }
 function Map(){
-  const [donnees, setDonnees] = useState<any>([])
-  const xx = async()=>{
+  const [donnees, setDonnees] = useState<any>()
+  
+  const fetchData = async()=>{
     let tab:any = []
       try{
-       
         const requests = COORDONNEES_REGION.map(async element => {
           const response = await axios.get(
               `https://api.openweathermap.org/data/2.5/weather?q=${element.ville}&units=metric&lang=fr&appid=dcea80cba359684c8af702c1b42982ba`,
           )
-          //setDonnees([...donnees, {lat:element.lat, lng:element.lng, temps:response.data.weather[0].icon, degres:Math.floor(response.data.main.temp)}])
-          tab.push({lat:element.lat, lng:element.lng, temps:response.data.weather[0].icon, degres:Math.floor(response.data.main.temp)})
-          //console.log({lat:element.lat, lng:element.lng, temps:response.data.weather[0].icon, degres:Math.floor(response.data.main.temp)}, "RESPONSE")
-      }) 
+          return {
+            lat:element.lat, 
+            lng:element.lng, 
+            temps:response.data.weather[0].icon, 
+            degres:Math.floor(response.data.main.temp)
+          }
+      })
+      const result = await Promise.all(requests)
+      setDonnees(result)
       }
       catch(err){
         console.log(err)
       }
-      setDonnees(tab)
   }
 
   useEffect(()=>{
-    xx()
+    fetchData()
   }, [])
 
   useEffect(()=>{
-    console.log(donnees, "DOOONNNEEES")
+    
+    console.log(donnees)
   }, [donnees])
 
   return(
@@ -62,17 +66,17 @@ function Map(){
             <Marker 
               key={k} position={{lat:v.lat, lng:v.lng}}
               icon={{url: `https://openweathermap.org/img/wn/${v.temps}@2x.png`,
-              scaledSize: window.innerWidth > 780 ? new window.google.maps.Size(60, 60) : new window.google.maps.Size(40, 40),
-              anchor: window.innerWidth > 780 ? new window.google.maps.Point(30, 30) : new window.google.maps.Point(20, 20),
+              scaledSize: new window.google.maps.Size(60, 60),
+              anchor: new window.google.maps.Point(30, 30),
         }}
         label={{
-            text: `${v.degres}°`,
-            fontWeight: '500',
-            className: styles.marker__label
-        }}
+          text: `${v.degres}°`,
+            fontWeight: '500'
+         }}
         />
-           ))
-            :""}
+           )):""
+}
+      
         </GoogleMap>
       </main>
       </div>
